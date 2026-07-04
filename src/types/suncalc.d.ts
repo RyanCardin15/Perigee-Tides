@@ -1,4 +1,4 @@
-declare module 'suncalc' {
+declare module "suncalc" {
   export interface MoonIllumination {
     /** fraction of moon's visible disk that is illuminated */
     fraction: number;
@@ -75,12 +75,21 @@ declare module 'suncalc' {
   /**
    * Calculates sun position for a given date and latitude/longitude
    */
-  export function getPosition(date: Date | number, lat: number, lng: number): SunPosition;
+  export function getPosition(
+    date: Date | number,
+    lat: number,
+    lng: number,
+  ): SunPosition;
 
   /**
    * Calculates sun times for a given date, latitude/longitude, and, optionally, the observer height (in meters) relative to the horizon
    */
-  export function getTimes(date: Date | number, lat: number, lng: number, height?: number): SunTimes;
+  export function getTimes(
+    date: Date | number,
+    lat: number,
+    lng: number,
+    height?: number,
+  ): SunTimes;
 
   /**
    * Returns an object with the following properties:
@@ -89,7 +98,11 @@ declare module 'suncalc' {
    * distance: distance to moon in kilometers
    * parallacticAngle: parallactic angle of the moon in radians
    */
-  export function getMoonPosition(date: Date | number, lat: number, lng: number): MoonPosition;
+  export function getMoonPosition(
+    date: Date | number,
+    lat: number,
+    lng: number,
+  ): MoonPosition;
 
   /**
    * Returns an object with the following properties:
@@ -106,5 +119,10 @@ declare module 'suncalc' {
    * alwaysUp: true if the moon never rises/sets and is always above the horizon during the day
    * alwaysDown: true if the moon is always below the horizon
    */
-  export function getMoonTimes(date: Date | number, lat: number, lng: number, inUTC?: boolean): MoonTimes;
-} 
+  export function getMoonTimes(
+    date: Date | number,
+    lat: number,
+    lng: number,
+    inUTC?: boolean,
+  ): MoonTimes;
+}

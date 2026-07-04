@@ -4,68 +4,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-### Building and Running
-- `npm run build` - Build TypeScript to JavaScript in `dist/` directory
-- `npm start` - Start the MCP server (requires build first)
-- `npm run dev` - Run in development mode with ts-node-esm
-- `npm run format` - Format code with Prettier
-- `npm test` - Run tests with Vitest
+- `npm run build` - Compile TypeScript to `dist/`
+- `npm test` - Run vitest unit tests (validation, formatting, cache, astronomy)
+- `npm run test:live` - End-to-end smoke test: spins up the built server over stdio and exercises every tool against the live NOAA API (`scripts/smoke-live.mjs`)
+- `npm run inspector` - MCP Inspector against `dist/index.js`
+- `npm run dev` - Run from source with tsx
+- `npm run format` - Prettier
 
-### Testing and Development
-- `npx fastmcp dev dist/index.js` - Test server with fastmcp CLI
-- `npx fastmcp inspect dist/index.js` - Inspect server capabilities
+Always `npm run build` before `npm run test:live` — the smoke test runs `dist/index.js`.
 
-## Architecture Overview
+## Architecture
 
-This is a FastMCP server that provides tools for accessing NOAA Tides and Currents data, moon phase information, and sun position calculations.
+MCP server built on the official `@modelcontextprotocol/sdk` (`McpServer` + `registerTool`/`registerResource`/`registerPrompt`). Entry point `src/index.ts` runs stdio by default; `--http [--port N]` starts a stateless streamable-HTTP endpoint at `/mcp`.
 
-### Core Structure
-- **Entry Point**: `src/index.ts` - Creates server, registers tools, and starts stdio transport
-- **Server Configuration**: `src/server/config.ts` - FastMCP server setup with fixed stdio transport
-- **Tool Registration**: `src/tools/index.ts` - Centralized tool registration hub
+**CRITICAL: never write to stdout.** In stdio mode stdout is the JSON-RPC channel; all logging must use `console.error`.
 
-### Service Layer
-The application follows a service-oriented architecture:
-- `NoaaService` - Handles all NOAA API interactions (data and metadata APIs)
-- `MoonPhaseService` - Calculates moon phases and lunar information
-- `SunService` - Calculates sun position, rise/set times using suncalc library
-- `NoaaParametersService` - Provides parameter definitions for NOAA API
+Layers (dependencies point downward):
 
-### Tool Categories
-Tools are organized by functional area:
-- **Water Tools** (`water-tools.ts`) - Water levels, tide predictions, currents
-- **Station Tools** (`station-tools.ts`) - Station metadata and information
-- **Moon Tools** (`moon-tools.ts`) - Moon phase calculations
-- **Sun Tools** (`sun-tools.ts`) - Sun position and event calculations
-- **Parameter Tools** (`parameter-tools.ts`) - API parameter definitions
+- `src/tools/*` — 23 tool registrations grouped by domain (water, currents, met, stations, station-metadata, derived, astronomy, reference). Each tool: Zod input schema with nuance-carrying `.describe()` texts, read-only annotations, markdown+json `response_format`, `structuredContent` attached, errors returned via `respondError` (never thrown to the protocol layer).
+- `src/services/*` — one module per NOAA API surface (`data-api.ts`, `metadata-api.ts`, `dpapi.ts`) plus local `moon-phase-service.ts` / `sun-service.ts` (suncalc).
+- `src/client/http.ts` — shared axios layer: 30s timeout, 2 retries with backoff on network/5xx/429, and error mapping that appends actionable hints. The three NOAA APIs fail differently: the Data API and DPAPI return HTTP 200 or 4xx with `{"error":{"message"}}` bodies; the Metadata API returns bare 404s with no body.
+- `src/client/cache.ts` — in-memory TTL cache (station directory 6h, station resources 1h). Nearest-station search is client-side Haversine over the cached directory because MDAPI ignores lat/lon/radius on its list endpoint (verified live).
+- `src/validation/dates.ts` — normalizes ISO dates to NOAA formats, enforces the five legal date-param combinations, and pre-validates per-product maximum request spans (see `MAX_SPAN_DAYS`).
+- `src/format/*` — unit labels per measurement (`units.ts`), flag legends, markdown table/series rendering, `CHARACTER_LIMIT` truncation.
+- `src/reference/content.ts` — curated reference topics served by both the `noaa_get_reference_guide` tool and `noaa://reference/{topic}` resources.
 
-### Data Validation
-- Uses Zod schemas for parameter validation in `src/schemas/common.ts`
-- Common validation patterns for dates, stations, units, formats, etc.
-- Refined validation for date parameter combinations
+## NOAA Domain Rules Encoded in This Codebase
 
-### API Integration
-- **NOAA Data API**: `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter`
-- **NOAA Metadata API**: `https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi`
-- Uses axios for HTTP requests with proper error handling
+Do not "simplify" these away; they mirror NOAA API behavior verified against the live API:
 
-### Key Dependencies
-- `fastmcp` - MCP server framework
-- `axios` - HTTP client for NOAA API calls
-- `suncalc` - Sun position and timing calculations
-- `zod` - Schema validation
-- TypeScript with ES modules and Node16 module resolution
+- Units: metric current speed is **cm/s** (wind is m/s); pressure always millibars; salinity always PSU.
+- Datums: required for water-level products; IGLD/LWD are Great Lakes-only; Great Lakes stations have no tide predictions.
+- `daily_mean` is Great Lakes-only and requires `time_zone=lst` (the service forces it).
+- Max request spans per product/interval are enforced client-side (`MAX_SPAN_DAYS` in validation/dates.ts).
+- Station IDs: 7-digit numeric (water level/met) vs alphanumeric (currents, e.g. `cb0102`).
+- Subordinate (type S) prediction stations support only `interval=hilo`; offsets come from `tidepredoffsets`.
+- `bin=0` on currents returns all bins but is capped at 7 days.
+- MDAPI response array keys differ from NOAA's docs (`datums`, `HarmonicConstituents`, `sensors`, `bins`, `notices`, `products`) — `extractList()` parses defensively.
+- DPAPI endpoint paths were verified live (e.g. `/webapi/product/sealvltrends.json`, `/webapi/product.json?name=toptenwaterlevels`, `/webapi/htf/htf_annual.json`). HTF `range` only works together with `year`; the service translates a bare `range` into "last N years".
+- The Data API `application` parameter is set on every call for NOAA traffic attribution.
 
-## Important Implementation Notes
+## Conventions
 
-### MCP Server Configuration
-The server uses stdio transport exclusively - do not modify to use other transports as this is designed for MCP client integration.
-
-### Error Handling
-NOAA API errors are caught and re-thrown with structured error messages including status codes and response data.
-
-### Date Handling
-The codebase supports multiple date formats and has specific validation logic for date parameter combinations (date vs begin_date/end_date).
-
-### Tool Organization
-Each tool category has its own registration function that accepts the server instance and relevant service(s). This modular approach makes it easy to add new tools or modify existing ones.
+- Tool names: `noaa_*` for NOAA-backed tools, `astro_*` for local astronomy.
+- New tools follow the existing pattern: schema in the register call, try/catch returning `respond()`/`respondError()`, units labeled in output, README + reference content updated.
+- Transport stays stdio-first for MCP client integration; the HTTP mode is stateless (fresh server+transport per request).

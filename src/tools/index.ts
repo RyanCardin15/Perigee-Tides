@@ -1,40 +1,24 @@
-import { FastMCP } from 'fastmcp';
-import { NoaaService } from '../services/noaa-service.js';
-import { MoonPhaseService } from '../services/moon-phase-service.js';
-import { SunService } from '../services/sun-service.js';
-import { NoaaParametersService } from '../services/noaa-parameters-service.js';
-import { DpapiService } from '../services/dpapi-service.js';
-import { registerWaterTools } from './water-tools.js';
-import { registerStationTools } from './station-tools.js';
-import { registerMoonTools } from './moon-tools.js';
-import { registerSunTools } from './sun-tools.js';
-import { registerParameterTools } from './parameter-tools.js';
-import { registerDerivedProductTools } from './derived-product-tools.js';
-
 /**
- * Register all tools with the MCP server
+ * Central registration for all tools.
  */
-export function registerAllTools(server: FastMCP) {
-  // Create service instances
-  const noaaService = new NoaaService();
-  const moonPhaseService = new MoonPhaseService();
-  const sunService = new SunService();
-  const parametersService = new NoaaParametersService();
-  const dpapiService = new DpapiService();
-  
-  // Register tools by category
-  registerWaterTools(server, noaaService);
-  registerStationTools(server, noaaService);
-  registerMoonTools(server, moonPhaseService);
-  registerSunTools(server, sunService);
-  registerParameterTools(server, parametersService);
-  registerDerivedProductTools(server, dpapiService);
-  
-  return {
-    noaaService,
-    moonPhaseService,
-    sunService,
-    parametersService,
-    dpapiService
-  };
-} 
+
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerWaterTools } from "./water.js";
+import { registerCurrentTools } from "./currents.js";
+import { registerMetTools } from "./met.js";
+import { registerStationTools } from "./stations.js";
+import { registerStationMetadataTools } from "./station-metadata.js";
+import { registerDerivedProductTools } from "./derived.js";
+import { registerAstronomyTools } from "./astronomy.js";
+import { registerReferenceTools } from "./reference.js";
+
+export function registerAllTools(server: McpServer): void {
+  registerWaterTools(server);
+  registerCurrentTools(server);
+  registerMetTools(server);
+  registerStationTools(server);
+  registerStationMetadataTools(server);
+  registerDerivedProductTools(server);
+  registerAstronomyTools(server);
+  registerReferenceTools(server);
+}

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:tidesandcurrents.noaa.gov)",
+      "WebFetch(domain:api.tidesandcurrents.noaa.gov)",
+      "WebFetch(domain:www.tidesandcurrents.noaa.gov)",
+      "WebFetch(domain:gofastmcp.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:deepwiki.com)",
+      "Bash(npm run build:*)",
+      "Bash(npx fastmcp inspect:*)",
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(npm test)",
+      "Bash(rm:*)",
+      "Bash(bash -c \"git status\")",
+      "Bash(export:*)",
+      "Bash(/usr/bin/git status)",
+      "Bash(exec /bin/bash -c \"git checkout -b feature/testing-branch\")",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx @modelcontextprotocol/inspector:*)",
+      "Bash(chmod:*)",
+      "Bash(npm pack:*)"
+    ],
+    "deny": []
+  }
+}

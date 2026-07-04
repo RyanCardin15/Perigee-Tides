@@ -7,388 +7,193 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![MCP](https://img.shields.io/badge/MCP-Model_Context_Protocol-green?style=for-the-badge)](https://modelcontextprotocol.io/)
 
-[![smithery badge](https://smithery.ai/badge/@RyanCardin15/noaa-tidesandcurrents-mcp)](https://smithery.ai/server/@RyanCardin15/noaa-tidesandcurrents-mcp)
+**A Model Context Protocol server for NOAA CO-OPS Tides and Currents data**
 
-**🚀 Lightning-fast access to NOAA's oceanic and atmospheric data through MCP**
-
-*Your one-stop solution for tides, currents, weather, astronomy, and climate data*
-
-[📦 Quick Start](#-quick-start) • [🛠️ Tools](#️-available-tools) • [📖 Examples](#-usage-examples) • [🏗️ Advanced](#️-advanced-usage)
+Water levels · tide predictions · currents · marine weather · station metadata ·
+tidal datums · harmonic constituents · sea level trends & projections ·
+high tide flooding · sun & moon calculations
 
 </div>
 
 ---
 
-## ✨ What Makes This Awesome
-
-🌊 **25+ Specialized Tools** - From basic tide data to advanced climate projections  
-⚡ **Lightning Fast** - Built on FastMCP for optimal performance  
-🎯 **Zero Config** - Works out of the box with Claude Desktop  
-🌍 **Comprehensive Data** - Water levels, currents, weather, moon phases, sun data  
-📊 **Climate Research Ready** - Sea level trends, flooding projections, extreme events  
-🚀 **NPX Ready** - Install and run with a single command  
-
----
-
-## 🚀 Quick Start
-
-### ⚡ NPX Installation (Recommended)
+## Quick Start
 
 ```bash
-# Install and run immediately - no setup required!
+# Run immediately with npx
 npx @ryancardin/noaa-tides-currents-mcp-server
 
-# Or use the shorter alias
+# Or the short alias
 npx noaa-mcp
 ```
 
-#### 🔌 Transport Modes
+### Claude Desktop / Claude Code configuration
 
-**STDIO Mode (Default - MCP Protocol)**
-```bash
-# Standard MCP server for Claude Desktop integration
-npx @ryancardin/noaa-tides-currents-mcp-server
-
-# Or use the shorter alias
-npx noaa-mcp
+```json
+{
+  "mcpServers": {
+    "noaa": {
+      "command": "npx",
+      "args": ["-y", "@ryancardin/noaa-tides-currents-mcp-server"]
+    }
+  }
+}
 ```
 
-**HTTP Streamable Mode (Web Integration)**
-```bash
-# Start HTTP server on default port 3000
-npx @ryancardin/noaa-tides-currents-mcp-server --http
-
-# Specify custom port
-npx @ryancardin/noaa-tides-currents-mcp-server --http --port 8080
-
-# Using shorter alias
-npx noaa-mcp --http --port 8080
-
-# Access via Server-Sent Events
-curl http://localhost:3000/sse
-```
-
-### 🎯 Claude Desktop Integration
-
-Install directly to Claude Desktop via [Smithery](https://smithery.ai/server/@RyanCardin15/tidesandcurrents):
+Claude Code one-liner:
 
 ```bash
-npx -y @smithery/cli install @RyanCardin15/tidesandcurrents --client claude
+claude mcp add noaa -- npx -y @ryancardin/noaa-tides-currents-mcp-server
 ```
 
-### 🔧 Manual Development Setup
+### HTTP mode (optional)
 
 ```bash
-# Clone and build
-git clone https://github.com/RyanCardin15/NOAA-Tides-And-Currents-MCP.git
-cd NOAA-Tides-And-Currents-MCP
-npm install && npm run build
-
-# Start the server
-npm start
-
-# Test with FastMCP
-npx fastmcp dev dist/index.js
+npx noaa-mcp --http --port 3000   # stateless streamable HTTP at http://localhost:3000/mcp
 ```
+
+No API key is required — NOAA's CO-OPS APIs are open.
 
 ---
 
-## 🛠️ Available Tools
+## Tools (23)
 
-<details>
-<summary><strong>🌊 Water Data Tools (6 tools)</strong></summary>
+### Observations & Predictions (Data API)
 
-### Water Levels & Tides
-- **`get_water_levels`** - Real-time and historical water level data
-- **`get_tide_predictions`** - High/low tide predictions and continuous data
-- **`get_currents`** - Real-time and historical current measurements  
-- **`get_current_predictions`** - Current speed and direction forecasts
-- **`get_meteorological_data`** - Wind, air temp, water temp, pressure, etc.
+| Tool | What it does |
+|---|---|
+| `noaa_get_water_levels` | Observed water levels: 1-minute, 6-minute, or hourly series, preliminary/verified quality flags decoded |
+| `noaa_get_water_level_summaries` | high_low (HH/H/L/LL daily extremes), daily_mean (Great Lakes), daily_max_min, monthly_mean datum tables |
+| `noaa_get_tide_predictions` | Harmonic tide predictions — `hilo` high/low events (up to 10 years) or interval series |
+| `noaa_get_currents` | Observed current speed/direction by depth bin (ADCP), optional beam diagnostics |
+| `noaa_get_current_predictions` | Predicted currents — `max_slack` flood/ebb/slack events or interval series |
+| `noaa_get_meteorological_data` | Wind, air/water temperature, pressure, air gap (bridge clearance), conductivity, visibility, humidity, salinity |
 
-### Station Information
-- **`get_stations`** - Search and list monitoring stations
-- **`get_station_details`** - Detailed station metadata and capabilities
+### Station Discovery & Metadata (Metadata API)
 
-</details>
+| Tool | What it does |
+|---|---|
+| `noaa_search_stations` | Search the station directory by capability type, name substring, state — paginated |
+| `noaa_find_nearest_stations` | Nearest stations to any lat/lon (great-circle, cached directory), filterable by type |
+| `noaa_get_station_info` | Full station record with expandable sensors, flood levels, benchmarks, bins, deployments... |
+| `noaa_get_station_datums` | Tidal datum elevations (MLLW, MSL, MHHW, NAVD88...), HAT/LAT, historic extremes, current or superseded epoch |
+| `noaa_get_harmonic_constituents` | The M2/S2/K1/... constituents behind a station's predictions (water level or current ellipse form) |
+| `noaa_get_prediction_offsets` | Subordinate-station time/height offsets from their reference stations (tide or current) |
 
-<details>
-<summary><strong>🔬 Climate & Research Tools (9 tools)</strong></summary>
+### Climate & Derived Products (DPAPI)
 
-### Sea Level Analysis
-- **`get_sea_level_trends`** - Long-term sea level rise trends and rates
-- **`get_extreme_water_levels`** - Statistical analysis of extreme events
+| Tool | What it does |
+|---|---|
+| `noaa_get_sea_level_trends` | Long-term relative sea level trend with error bars and observation period |
+| `noaa_get_sea_level_rise_projections` | 2022 Interagency SLR scenario projections per decade through 2150 |
+| `noaa_get_extreme_water_levels` | Annual exceedance probability levels (e.g. the "100-year" water level) |
+| `noaa_get_top_ten_water_levels` | Highest water levels ever recorded, with causal events (hurricanes, nor'easters) |
+| `noaa_get_high_tide_flooding` | HTF flood-day counts (daily/monthly/seasonal/annual), outlooks, decadal projections, likelihoods |
 
-### High Tide Flooding Analysis
-- **`get_high_tide_flooding_daily`** - Daily flood event counts
-- **`get_high_tide_flooding_monthly`** - Monthly flooding patterns
-- **`get_high_tide_flooding_seasonal`** - Seasonal flood analysis
-- **`get_high_tide_flooding_annual`** - Yearly flooding trends
-- **`get_high_tide_flooding_projections`** - Future flood risk scenarios
-- **`get_high_tide_flooding_likelihoods`** - Daily flood probability
+### Astronomy (computed locally)
 
-### Historical Extremes
-- **`get_top_ten_water_levels`** - Highest/lowest water levels on record
+| Tool | What it does |
+|---|---|
+| `astro_get_moon_phase` | Phase, illumination, age, distance for a date or range (spring/neap tide context) |
+| `astro_get_next_moon_phase` | Next new/full/quarter moon date(s) |
+| `astro_get_sun_times` | Sunrise/sunset, twilights, golden hour, day length for any location/date |
+| `astro_get_sun_position` | Azimuth/altitude (+ approximate declination/RA) |
+| `astro_get_next_sun_event` | Next occurrence(s) of any sun event |
 
-</details>
+### Reference
 
-<details>
-<summary><strong>🌙 Astronomy Tools (7 tools)</strong></summary>
+| Tool | What it does |
+|---|---|
+| `noaa_get_reference_guide` | Curated NOAA reference: products, datums, units, time zones, intervals, station types, data limits, quality flags, date formats |
 
-### Moon Phase Calculations
-- **`get_moon_phase`** - Current moon phase and illumination
-- **`get_moon_phases_range`** - Moon phases over date ranges
-- **`get_next_moon_phase`** - Find next new/full/quarter moons
+Every tool supports `response_format: "markdown"` (readable tables with units spelled out — the default) or `"json"` (complete structured payload), and attaches structured content for MCP clients that consume it.
 
-### Solar Calculations  
-- **`get_sun_times`** - Sunrise, sunset, dawn, dusk times
-- **`get_sun_times_range`** - Solar times over date ranges
-- **`get_sun_position`** - Real-time sun azimuth and elevation
-- **`get_next_sun_event`** - Next sunrise, sunset, or solar noon
+## Resources
 
-</details>
+- `noaa://guide/getting-started` — workflow recipes and common pitfalls
+- `noaa://reference/{topic}` — the nine reference topics above as pinnable resources
 
-<details>
-<summary><strong>⚙️ Configuration Tools (1 tool)</strong></summary>
+## Prompts
 
-### API Parameters
-- **`get_parameter_definitions`** - Valid values for all API parameters
-
-</details>
-
----
-
-## 📖 Usage Examples
-
-### 🌊 Get Current Tide Conditions
-
-```bash
-# Get latest water levels for Boston Harbor
-get_water_levels station="8443970" date="latest"
-
-# Get today's tide predictions for Miami
-get_tide_predictions station="8723214" begin_date="today" end_date="today" interval="hilo"
-```
-
-### 🌀 Hurricane Preparedness 
-
-```bash
-# Get extreme water level statistics for storm planning
-get_extreme_water_levels station="8518750" units="english"
-
-# Check flooding likelihood for tomorrow
-get_high_tide_flooding_likelihoods station="8518750" date="2024-12-16" threshold="minor"
-```
-
-### 🔬 Climate Research
-
-```bash
-# Analyze 30-year sea level trends
-get_sea_level_trends station="8518750" affiliation="US"
-
-# Get high tide flooding projections for 2050s under intermediate sea level rise
-get_high_tide_flooding_projections station="8518750" scenario="intermediate" decade="2050s"
-```
-
-### 🌙 Astronomy & Navigation
-
-```bash
-# Get tonight's moon phase for navigation
-get_moon_phase date="2024-12-15" latitude="42.3601" longitude="-71.0589"
-
-# Calculate sunrise/sunset for sailing
-get_sun_times date="2024-12-15" latitude="25.7617" longitude="-80.1918" timezone="America/New_York"
-```
-
-### 🎣 Fishing & Recreation
-
-```bash
-# Best fishing times with current predictions
-get_current_predictions station="ACT0446" date="today" interval="MAX_SLACK"
-
-# Wind and weather conditions
-get_meteorological_data station="8443970" product="wind" date="today"
-```
+- `tide_report` — tide report for a place/station and date
+- `boating_conditions` — pre-departure briefing: tides, currents, wind, daylight
+- `station_flood_risk` — flood risk profile: HTF history, extremes, trends, projections
+- `station_overview` — everything a station offers
 
 ---
 
-## 🏗️ Advanced Usage
+## The Nuances (handled for you)
 
-### 🔧 Development & Testing
+These are the things that make NOAA's API tricky — this server encodes them:
 
-```bash
-# Run in development mode (stdio)
-npm run dev
-
-# Development with HTTP transport
-npm run dev:http
-
-# Production builds with different transports
-npm start                    # STDIO mode (default)
-npm run start:http          # HTTP on port 3000
-npm run start:http:3001     # HTTP on port 3001
-npm run start:http:8080     # HTTP on port 8080
-
-# Inspect server capabilities
-npx fastmcp inspect dist/index.js
-```
-
-### 🌐 HTTP Stream Integration
-
-When running in HTTP mode, the server provides Server-Sent Events (SSE) at `/sse`:
-
-```bash
-# Start HTTP server
-npx @ryancardin/noaa-tides-currents-mcp-server --http --port 3000
-
-# Test the endpoint
-curl -N http://localhost:3000/sse
-
-# Or integrate with web applications
-fetch('http://localhost:3000/sse')
-  .then(response => response.body.getReader())
-  .then(reader => {
-    // Handle streaming MCP responses
-  });
-```
-
-**Use Cases for HTTP Mode:**
-- 🌐 **Web Applications** - Integrate with React, Vue, Angular apps
-- 📱 **Mobile Apps** - REST-like access from mobile applications  
-- 🔗 **API Gateways** - Proxy through load balancers or API gateways
-- 🧪 **Testing** - Easy curl-based testing and debugging
-
-### 📊 Data Formats & Export
-
-All tools support multiple output formats:
-- **JSON** (default) - Perfect for programmatic use
-- **XML** - Legacy system integration  
-- **CSV** - Direct spreadsheet import
-
-### 🌍 Global Station Coverage
-
-- **13,000+ stations** worldwide
-- **Real-time data** from NOAA's CO-OPS network
-- **Historical records** dating back decades
-- **Global tide predictions** and current forecasts
+- **Datums matter.** Heights are meaningless without a vertical reference. MLLW (chart datum) is the default; stations differ in which datums they support (Great Lakes use IGLD/LWD and have **no tide predictions**). `noaa_get_station_datums` gives the conversion table.
+- **Units are asymmetric.** `metric` means m/s for wind but **cm/s for currents**; air pressure is millibars and salinity PSU in *both* systems. Every response labels its units.
+- **Per-product request-span limits** (4 days for 1-minute data, 31 days for 6-minute, 1 year hourly, 10 years for hilo predictions...) are validated client-side with actionable messages before hitting NOAA.
+- **Two station ID schemes.** Water-level/met stations are 7-digit numeric (`9414290`); current stations are alphanumeric (`cb0102`).
+- **Reference vs subordinate stations.** Subordinate (S) prediction stations only support `hilo` predictions, derived by offsets from a reference (R) station.
+- **`daily_mean` requires local standard time** and only exists for Great Lakes stations — enforced automatically.
+- **Quality flags decoded.** Preliminary vs verified data, sigma, flag alphabets (which differ between preliminary and verified!), and HH/H/L/LL tide types are explained inline.
+- **Predictions are astronomical** — storm surge is not included; compare with observed water levels.
+- **Station directory is cached** (6 h) so nearest-station searches don't refetch thousands of records.
 
 ---
 
-## 🚦 API Endpoints
+## Usage Examples
 
-This server integrates with three NOAA APIs:
+> "When is high tide in Boston tomorrow?"
 
-| API | Purpose | Base URL |
-|-----|---------|----------|
-| **Data API** | Real-time observations & predictions | `api.tidesandcurrents.noaa.gov/api/prod/` |
-| **Metadata API** | Station information & capabilities | `api.tidesandcurrents.noaa.gov/mdapi/prod/` |
-| **Derived Products API** | Climate analysis & research data | `api.tidesandcurrents.noaa.gov/dpapi/prod/` |
+1. `noaa_find_nearest_stations` (type `tidepredictions`) → `8443970 BOSTON`
+2. `noaa_get_tide_predictions` (interval `hilo`) → high/low times & heights above MLLW
+
+> "How strong will the current be in the Cape Cod Canal this afternoon?"
+
+1. `noaa_find_nearest_stations` (type `currentpredictions`)
+2. `noaa_get_current_predictions` (interval `max_slack`) → max flood/ebb (knots) and slack times
+
+> "How often does Providence flood now vs 20 years ago, and what's projected for 2050?"
+
+1. `noaa_get_high_tide_flooding` (report `annual`, range 25)
+2. `noaa_get_high_tide_flooding` (report `projections`, decade 2050)
+3. `noaa_get_sea_level_trends` + `noaa_get_sea_level_rise_projections`
 
 ---
 
-## 🛠️ Technical Details
+## Development
+
+```bash
+npm install
+npm run build        # tsc → dist/
+npm test             # vitest unit tests (validation, formatting, astronomy)
+npm run test:live    # end-to-end smoke test against the live NOAA API
+npm run inspector    # MCP Inspector against dist/index.js
+npm run dev          # tsx src/index.ts
+```
 
 ### Architecture
-- **🚀 FastMCP Framework** - High-performance MCP server
-- **📝 TypeScript** - Full type safety and IntelliSense
-- **🔧 Zod Validation** - Runtime parameter validation
-- **⚡ Axios HTTP Client** - Reliable API communication
-- **🌙 SunCalc Integration** - Precise astronomical calculations
 
-### Transport Options
-- **📡 STDIO Transport** - Standard MCP protocol for desktop clients
-- **🌐 HTTP Stream Transport** - Server-Sent Events for web integration
-- **🔄 Dual Mode Support** - Switch between transports via command-line flags
-
-### System Requirements
-- **Node.js** 18+ 
-- **NPM** 8+
-- **MCP Client** (Claude Desktop, etc.)
-
-### Package Size
-- **📦 Bundled**: 43.9 KB
-- **📂 Installed**: 286.2 KB
-- **⚡ Load Time**: <100ms
-
----
-
-## 🐛 Troubleshooting
-
-<details>
-<summary><strong>Common Issues & Solutions</strong></summary>
-
-### Server Won't Start
-```bash
-# Check Node.js version
-node --version  # Should be 18+
-
-# Rebuild TypeScript
-npm run build
+```
+src/
+├── index.ts            # entry point: stdio (default) or --http streamable HTTP
+├── constants.ts        # API base URLs, timeouts, cache TTLs, response limits
+├── client/             # shared HTTP layer (retry/backoff, error mapping) + TTL cache
+├── validation/         # date normalization + per-product span limit enforcement
+├── format/             # unit labeling, flag legends, markdown/json response shaping
+├── schemas/            # shared Zod field schemas with nuance-carrying descriptions
+├── services/           # Data API, Metadata API, DPAPI, moon & sun services
+├── tools/              # 23 tool registrations grouped by domain
+├── resources/          # noaa:// reference resources
+├── prompts/            # workflow prompt templates
+└── reference/          # curated NOAA reference content
 ```
 
-### API Errors
-- **Invalid Station ID**: Use `get_stations` to find valid stations
-- **Date Format Issues**: Use YYYYMMDD or MM/DD/YYYY formats
-- **Rate Limiting**: NOAA APIs have usage limits - space out requests
+Data sources:
+- **Data API** — `api.tidesandcurrents.noaa.gov/api/prod/datagetter`
+- **Metadata API** — `api.tidesandcurrents.noaa.gov/mdapi/prod/webapi`
+- **Derived Product API** — `api.tidesandcurrents.noaa.gov/dpapi/prod/webapi`
+- **Astronomy** — [suncalc](https://github.com/mourner/suncalc), computed locally
 
-### MCP Connection Issues
-- Ensure Claude Desktop MCP settings are configured correctly
-- Check that the server binary has execute permissions: `chmod +x dist/index.js`
+## License
 
-</details>
+MIT © Ryan Cardin
 
----
-
-## 📈 Roadmap
-
-- [ ] 🌊 **Real-time Alerts** - Webhook support for tide/weather alerts
-- [ ] 📱 **Mobile SDK** - React Native integration
-- [ ] 🗺️ **GIS Integration** - Shapefile and KML export
-- [ ] 🤖 **AI Insights** - Automated pattern recognition
-- [ ] ⚡ **GraphQL API** - Modern query interface
-- [ ] 🌐 **Multi-language** - I18n support
-
----
-
-## 🤝 Contributing
-
-We love contributions! Here's how to get started:
-
-1. **🍴 Fork** the repository
-2. **🌿 Branch** for your feature (`git checkout -b amazing-feature`)
-3. **💻 Code** your improvements
-4. **✅ Test** with `npm test`
-5. **📤 Submit** a pull request
-
-### Development Commands
-```bash
-npm run build    # Build TypeScript
-npm run dev      # Development mode  
-npm run test     # Run test suite
-npm run format   # Format with Prettier
-```
-
----
-
-## 📄 License
-
-**MIT License** - see [LICENSE](LICENSE) file for details.
-
-Built with ❤️ by [Ryan Cardin](https://github.com/RyanCardin15)
-
----
-
-## 🔗 Links & Resources
-
-- **📦 NPM Package**: [@ryancardin/noaa-tides-currents-mcp-server](https://www.npmjs.com/package/@ryancardin/noaa-tides-currents-mcp-server)
-- **🏪 Smithery**: [Auto-install for Claude Desktop](https://smithery.ai/server/@RyanCardin15/noaa-tidesandcurrents-mcp)  
-- **🌊 NOAA CO-OPS**: [Official NOAA Data Portal](https://tidesandcurrents.noaa.gov/)
-- **🤖 MCP Protocol**: [Model Context Protocol Docs](https://modelcontextprotocol.io/)
-- **⚡ FastMCP**: [FastMCP Framework](https://github.com/jlowin/fastmcp)
-
-<div align="center">
-
-**⭐ Star this repo if it helped you!**
-
-Made possible by NOAA's commitment to open oceanic data 🌊
-
-</div>
+NOAA data is provided by the NOAA Center for Operational Oceanographic Products and Services (CO-OPS). This project is not affiliated with or endorsed by NOAA.

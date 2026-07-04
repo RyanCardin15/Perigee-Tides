@@ -2,19 +2,19 @@
  * Sun event types
  */
 export enum SunEventType {
-  SUNRISE = 'sunrise',
-  SUNSET = 'sunset',
-  DAWN = 'dawn',
-  DUSK = 'dusk',
-  SOLAR_NOON = 'solarNoon',
-  NIGHT_START = 'night',
-  NIGHT_END = 'nightEnd',
-  GOLDEN_HOUR_START = 'goldenHourStart',
-  GOLDEN_HOUR_END = 'goldenHourEnd',
-  NAUTICAL_DAWN = 'nauticalDawn',
-  NAUTICAL_DUSK = 'nauticalDusk',
-  ASTRONOMICAL_DAWN = 'astronomicalDawn',
-  ASTRONOMICAL_DUSK = 'astronomicalDusk'
+  SUNRISE = "sunrise",
+  SUNSET = "sunset",
+  DAWN = "dawn",
+  DUSK = "dusk",
+  SOLAR_NOON = "solarNoon",
+  NIGHT_START = "night",
+  NIGHT_END = "nightEnd",
+  GOLDEN_HOUR_START = "goldenHourStart",
+  GOLDEN_HOUR_END = "goldenHourEnd",
+  NAUTICAL_DAWN = "nauticalDawn",
+  NAUTICAL_DUSK = "nauticalDusk",
+  ASTRONOMICAL_DAWN = "astronomicalDawn",
+  ASTRONOMICAL_DUSK = "astronomicalDusk",
 }
 
 /**
@@ -48,4 +48,4 @@ export interface SunPositionInfo {
   altitude: number;
   declination: number;
   rightAscension: number;
-} 
+}

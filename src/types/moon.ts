@@ -2,14 +2,14 @@
  * Moon phase names and their approximate ranges
  */
 export enum MoonPhaseName {
-  NEW_MOON = 'New Moon',
-  WAXING_CRESCENT = 'Waxing Crescent',
-  FIRST_QUARTER = 'First Quarter',
-  WAXING_GIBBOUS = 'Waxing Gibbous',
-  FULL_MOON = 'Full Moon',
-  WANING_GIBBOUS = 'Waning Gibbous',
-  LAST_QUARTER = 'Last Quarter',
-  WANING_CRESCENT = 'Waning Crescent'
+  NEW_MOON = "New Moon",
+  WAXING_CRESCENT = "Waxing Crescent",
+  FIRST_QUARTER = "First Quarter",
+  WAXING_GIBBOUS = "Waxing Gibbous",
+  FULL_MOON = "Full Moon",
+  WANING_GIBBOUS = "Waning Gibbous",
+  LAST_QUARTER = "Last Quarter",
+  WANING_CRESCENT = "Waning Crescent",
 }
 
 /**
@@ -24,4 +24,4 @@ export interface MoonPhaseInfo {
   distance: number;
   diameter: number;
   isWaxing: boolean;
-} 
+}
