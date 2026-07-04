@@ -35,6 +35,7 @@
     "api"
   ],
   "author": "Ryan Cardin",
+  "mcpName": "io.github.ryancardin15/noaa-tides-and-currents-mcp",
   "repository": {
     "type": "git",
     "url": "https://github.com/RyanCardin15/NOAA-Tides-And-Currents-MCP.git"
