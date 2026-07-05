@@ -1,6 +1,6 @@
 {
   "name": "@ryancardin/noaa-tides-currents-mcp-server",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "MCP server for NOAA CO-OPS Tides and Currents: water levels, tide predictions, currents, meteorology, station metadata, datums, high tide flooding, sea level trends, plus sun and moon calculations",
   "main": "dist/index.js",
   "bin": {
@@ -35,6 +35,7 @@
     "api"
   ],
   "author": "Ryan Cardin",
+  "mcpName": "io.github.RyanCardin15/noaa-tides-and-currents-mcp",
   "repository": {
     "type": "git",
     "url": "https://github.com/RyanCardin15/NOAA-Tides-And-Currents-MCP.git"
