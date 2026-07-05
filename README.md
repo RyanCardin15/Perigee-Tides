@@ -9,6 +9,8 @@
 
 **A Model Context Protocol server for NOAA CO-OPS Tides and Currents data**
 
+Built by [Cardin Labs](https://cardinlabs.com) · Hosted at [Perigee](https://perigee-two.vercel.app)
+
 Water levels · tide predictions · currents · marine weather · station metadata ·
 tidal datums · harmonic constituents · sea level trends & projections ·
 high tide flooding · sun & moon calculations
@@ -194,6 +196,6 @@ Data sources:
 
 ## License
 
-MIT © Ryan Cardin
+MIT © [Cardin LLC](https://cardinlabs.com) (Cardin Labs)
 
 NOAA data is provided by the NOAA Center for Operational Oceanographic Products and Services (CO-OPS). This project is not affiliated with or endorsed by NOAA.

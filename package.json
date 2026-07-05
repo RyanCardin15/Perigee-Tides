@@ -34,7 +34,7 @@
     "model-context-protocol",
     "api"
   ],
-  "author": "Ryan Cardin",
+  "author": "Cardin Labs <support@cardinlabs.com> (https://cardinlabs.com)",
   "mcpName": "io.github.RyanCardin15/noaa-tides-and-currents-mcp",
   "repository": {
     "type": "git",
