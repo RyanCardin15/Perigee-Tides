@@ -58,7 +58,7 @@ No API key is required — NOAA's CO-OPS APIs are open.
 
 ---
 
-## Tools (23)
+## Tools (25)
 
 ### Observations & Predictions (Data API)
 
@@ -102,18 +102,25 @@ No API key is required — NOAA's CO-OPS APIs are open.
 | `astro_get_sun_position` | Azimuth/altitude (+ approximate declination/RA) |
 | `astro_get_next_sun_event` | Next occurrence(s) of any sun event |
 
+### Wind & Marine Forecasts (NWS Weather API)
+
+| Tool | What it does |
+|---|---|
+| `nws_get_wind_forecast` | Hourly numeric wind forecast (speed/gust/direction, wave height where gridded) for any US lat/lon, up to ~7 days |
+| `nws_get_marine_forecast` | Official Coastal Waters Forecast narrative for the marine zone covering a lat/lon, incl. Small Craft Advisories |
+
 ### Reference
 
 | Tool | What it does |
 |---|---|
-| `noaa_get_reference_guide` | Curated NOAA reference: products, datums, units, time zones, intervals, station types, data limits, quality flags, date formats |
+| `noaa_get_reference_guide` | Curated NOAA reference: products, datums, units, time zones, intervals, station types, data limits, quality flags, date formats, marine forecasts |
 
 Every tool supports `response_format: "markdown"` (readable tables with units spelled out — the default) or `"json"` (complete structured payload), and attaches structured content for MCP clients that consume it.
 
 ## Resources
 
 - `noaa://guide/getting-started` — workflow recipes and common pitfalls
-- `noaa://reference/{topic}` — the nine reference topics above as pinnable resources
+- `noaa://reference/{topic}` — the ten reference topics above as pinnable resources
 
 ## Prompts
 

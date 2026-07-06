@@ -17,6 +17,8 @@ import {
   DPAPI_BASE_URL,
   MAX_RETRIES,
   METADATA_API_BASE_URL,
+  NWS_API_BASE_URL,
+  NWS_USER_AGENT,
   REQUEST_TIMEOUT_MS,
 } from "../constants.js";
 
@@ -36,6 +38,16 @@ const http: AxiosInstance = axios.create({
   headers: {
     Accept: "application/json",
     "User-Agent": `${APPLICATION_NAME}/2.0`,
+  },
+});
+
+// Separate instance for the NWS Weather API: NWS mandates a descriptive
+// User-Agent with contact info, and serves GeoJSON rather than plain JSON.
+const nwsHttp: AxiosInstance = axios.create({
+  timeout: REQUEST_TIMEOUT_MS,
+  headers: {
+    Accept: "application/geo+json, application/ld+json, application/json",
+    "User-Agent": NWS_USER_AGENT,
   },
 });
 
@@ -65,11 +77,12 @@ export function cleanParams(
 async function getWithRetry<T>(
   url: string,
   params: Record<string, string>,
+  instance: AxiosInstance = http,
 ): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await http.get<T>(url, { params });
+      const response = await instance.get<T>(url, { params });
       return response.data;
     } catch (error) {
       lastError = error;
@@ -202,6 +215,75 @@ export async function fetchMetadataApi<T = Record<string, unknown>>(
     );
   } catch (error) {
     throw toNoaaError(error, "Metadata API");
+  }
+}
+
+/**
+ * Shape of NWS API error bodies: RFC 7807 problem+json —
+ * {"type": "...", "title": "...", "status": 404, "detail": "..."}.
+ */
+function extractNwsProblem(data: unknown): string | undefined {
+  if (data && typeof data === "object") {
+    const body = data as { title?: string; detail?: string };
+    const parts = [body.title, body.detail].filter(
+      (s): s is string => typeof s === "string" && s.length > 0,
+    );
+    if (parts.length > 0) return parts.join(": ");
+  }
+  return undefined;
+}
+
+function toNwsError(error: unknown): NoaaApiError {
+  if (axios.isAxiosError(error)) {
+    const axErr = error as AxiosError;
+    if (axErr.response) {
+      const status = axErr.response.status;
+      const problem = extractNwsProblem(axErr.response.data);
+      if (problem) {
+        return new NoaaApiError(`NWS API error: ${problem}`, status);
+      }
+      if (status === 404) {
+        return new NoaaApiError(
+          "NWS API error: not found (404). NWS forecasts cover the US and its territories only — the point may be outside coverage, or too far offshore for a gridpoint.",
+          status,
+        );
+      }
+      if (status === 429) {
+        return new NoaaApiError(
+          "NWS API error: rate limited (429). Wait a few seconds and retry.",
+          status,
+        );
+      }
+      return new NoaaApiError(`NWS API error: HTTP ${status}.`, status);
+    }
+    if (axErr.code === "ECONNABORTED") {
+      return new NoaaApiError(
+        `NWS API error: request timed out after ${REQUEST_TIMEOUT_MS / 1000}s. Retry.`,
+      );
+    }
+    return new NoaaApiError(
+      `NWS API error: network failure (${axErr.code ?? "unknown"}).`,
+    );
+  }
+  return new NoaaApiError(
+    `NWS API error: ${error instanceof Error ? error.message : String(error)}`,
+  );
+}
+
+/** NWS Weather API GET: path like "/points/28.77,-95.62" or "/products/{id}". */
+export async function fetchNwsApi<T = Record<string, unknown>>(
+  path: string,
+  params: Record<string, string | number | boolean | undefined | null> = {},
+): Promise<T> {
+  try {
+    return await getWithRetry<T>(
+      `${NWS_API_BASE_URL}${path}`,
+      cleanParams(params),
+      nwsHttp,
+    );
+  } catch (error) {
+    if (error instanceof NoaaApiError) throw error;
+    throw toNwsError(error);
   }
 }
 

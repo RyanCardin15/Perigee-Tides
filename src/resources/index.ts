@@ -29,6 +29,14 @@ Typical workflows:
 - noaa_get_meteorological_data (product "wind"/"air_temperature", date "latest")
 - noaa_get_currents (date "latest") at a current station (different ID scheme!)
 
+## "What will the wind do tomorrow near <place>?"
+1. Geocode the place to lat/lon (outside this server).
+2. nws_get_wind_forecast (hours 48) → hourly numeric speed/gust/direction.
+3. nws_get_marine_forecast for the official Coastal Waters Forecast narrative
+   (small-craft advisories, sea state) when the point is in US coastal waters.
+Forecast ≠ observation: measured wind right now comes from
+noaa_get_meteorological_data (product "wind") at a station with a met sensor.
+
 ## "How often does <station> flood, and what's projected?"
 - noaa_get_high_tide_flooding (report "annual", range 15)
 - noaa_get_sea_level_trends, noaa_get_sea_level_rise_projections

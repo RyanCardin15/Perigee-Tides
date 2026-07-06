@@ -14,6 +14,16 @@ export const METADATA_API_BASE_URL =
 export const DPAPI_BASE_URL =
   "https://api.tidesandcurrents.noaa.gov/dpapi/prod";
 
+/** NWS Weather API (point/gridpoint forecasts, marine zone text products). */
+export const NWS_API_BASE_URL = "https://api.weather.gov";
+
+/**
+ * NWS requires a descriptive User-Agent identifying the application and a
+ * contact point (their abuse-mitigation mechanism; the API has no keys).
+ */
+export const NWS_USER_AGENT =
+  "noaa-tides-currents-mcp-server (perigeetides.com, ryandcardin@gmail.com)";
+
 /**
  * Sent as the `application` parameter on every Data API call so NOAA can
  * attribute traffic in their logs (not an API key; the API is open).
@@ -37,4 +47,8 @@ export const CACHE_TTL = {
   stationList: 6 * 60 * 60 * 1000,
   /** Individual station metadata (datums, sensors, harcon...). */
   stationResource: 60 * 60 * 1000,
+  /** Lat/lon → NWS gridpoint resolution (grid assignments drift rarely, but do drift). */
+  nwsPoint: 6 * 60 * 60 * 1000,
+  /** NWS forecasts and marine text products update roughly hourly. */
+  nwsForecast: 30 * 60 * 1000,
 } as const;

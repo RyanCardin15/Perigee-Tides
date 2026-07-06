@@ -21,7 +21,7 @@ MCP server built on the official `@modelcontextprotocol/sdk` (`McpServer` + `reg
 
 Layers (dependencies point downward):
 
-- `src/tools/*` — 23 tool registrations grouped by domain (water, currents, met, stations, station-metadata, derived, astronomy, reference). Each tool: Zod input schema with nuance-carrying `.describe()` texts, read-only annotations, markdown+json `response_format`, `structuredContent` attached, errors returned via `respondError` (never thrown to the protocol layer).
+- `src/tools/*` — 25 tool registrations grouped by domain (water, currents, met, stations, station-metadata, derived, astronomy, marine-forecast, reference). Each tool: Zod input schema with nuance-carrying `.describe()` texts, read-only annotations, markdown+json `response_format`, `structuredContent` attached, errors returned via `respondError` (never thrown to the protocol layer).
 - `src/services/*` — one module per NOAA API surface (`data-api.ts`, `metadata-api.ts`, `dpapi.ts`) plus local `moon-phase-service.ts` / `sun-service.ts` (suncalc).
 - `src/client/http.ts` — shared axios layer: 30s timeout, 2 retries with backoff on network/5xx/429, and error mapping that appends actionable hints. The three NOAA APIs fail differently: the Data API and DPAPI return HTTP 200 or 4xx with `{"error":{"message"}}` bodies; the Metadata API returns bare 404s with no body.
 - `src/client/cache.ts` — in-memory TTL cache (station directory 6h, station resources 1h). Nearest-station search is client-side Haversine over the cached directory because MDAPI ignores lat/lon/radius on its list endpoint (verified live).
@@ -46,6 +46,6 @@ Do not "simplify" these away; they mirror NOAA API behavior verified against the
 
 ## Conventions
 
-- Tool names: `noaa_*` for NOAA-backed tools, `astro_*` for local astronomy.
+- Tool names: `noaa_*` for CO-OPS-backed tools, `nws_*` for NWS Weather API forecasts, `astro_*` for local astronomy.
 - New tools follow the existing pattern: schema in the register call, try/catch returning `respond()`/`respondError()`, units labeled in output, README + reference content updated.
 - Transport stays stdio-first for MCP client integration; the HTTP mode is stateless (fresh server+transport per request).

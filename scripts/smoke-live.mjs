@@ -3,7 +3,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const transport = new StdioClientTransport({
   command: 'node',
-  args: ['/Users/ryancardin/Src/McpServer/NOAA/dist/index.js'],
+  args: [new URL('../dist/index.js', import.meta.url).pathname],
 });
 const client = new Client({ name: 'smoke', version: '1.0.0' });
 await client.connect(transport);
@@ -63,6 +63,12 @@ await call('astro_get_moon_phase', { date: '2026-07-04' });
 await call('astro_get_next_moon_phase', { phase: 'Full Moon', date: '2026-07-04', count: 2 });
 await call('astro_get_sun_times', { latitude: 41.8, longitude: -71.4, date: '2026-07-04', timezone: 'America/New_York' });
 await call('astro_get_next_sun_event', { event: 'goldenHourStart', latitude: 41.8, longitude: -71.4, date: '2026-07-04' });
+
+// NWS forecasts (Sargent TX / Matagorda Bay — a marine-typed gridpoint)
+await call('nws_get_wind_forecast', { latitude: 28.77, longitude: -95.62, hours: 12 });
+await call('nws_get_wind_forecast', { latitude: 28.77, longitude: -95.62, hours: 6, units: 'metric' });
+await call('nws_get_marine_forecast', { latitude: 28.77, longitude: -95.62 });
+await call('nws_get_marine_forecast', { latitude: 39.0, longitude: -105.5 }); // inland -> actionable error
 
 // Reference + resources + prompts
 await call('noaa_get_reference_guide', { topic: 'units' });

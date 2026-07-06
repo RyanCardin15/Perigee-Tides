@@ -14,6 +14,7 @@ export const REFERENCE_TOPICS = [
   "data_limits",
   "quality_flags",
   "date_formats",
+  "marine_forecast",
 ] as const;
 
 export type ReferenceTopic = (typeof REFERENCE_TOPICS)[number];
@@ -199,6 +200,29 @@ Exactly ONE of these combinations per request:
 5. range alone — N hours back from now
 
 Timestamps in responses are in the requested time_zone (gmt | lst | lst_ldt).`,
+
+  marine_forecast: `# Wind & Marine Forecasts (NWS)
+
+Forecasts come from the NWS Weather API (api.weather.gov) — a different NOAA
+service from CO-OPS. CO-OPS observes and predicts tides; NWS forecasts weather.
+
+| Need | Tool |
+|---|---|
+| Hourly wind forecast (numeric speed/gust/direction) at a lat/lon | nws_get_wind_forecast |
+| Official marine narrative (Coastal Waters Forecast, advisories) | nws_get_marine_forecast |
+| OBSERVED wind right now at a NOAA station | noaa_get_meteorological_data (product "wind") |
+
+How it works:
+- A lat/lon resolves to a forecast-office gridpoint (points → gridpoints);
+  values are numeric NDFD series with up to a ~7-day (156 h) horizon.
+- Wave height appears on marine/nearshore gridpoints; swell period/direction
+  are generally only populated for open-ocean grids, not bays.
+- Marine text forecasts are per-ZONE (e.g. GMZ350 "Freeport to Matagorda Ship
+  Channel out 20 NM"); one office bulletin covers many zones and the tool
+  extracts the matching segment. Winds in the narrative are in KNOTS.
+- Coverage: US and territories only. No API key; forecasts update ~hourly.
+- Forecast wind direction is where the wind blows FROM, degrees true — same
+  convention as CO-OPS wind observations.`,
 };
 
 /** One-line summaries used in resource listings and the guide index. */
@@ -212,4 +236,5 @@ export const REFERENCE_SUMMARIES: Record<ReferenceTopic, string> = {
   data_limits: "Maximum date-range span per product",
   quality_flags: "Data quality fields (v/s/f/q), flag letters, HH/H/L/LL",
   date_formats: "Accepted date formats and parameter combinations",
+  marine_forecast: "NWS wind & marine forecast tools vs CO-OPS observations",
 };
