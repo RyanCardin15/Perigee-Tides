@@ -1,0 +1,60 @@
+name: Codex plan
+description: A Codex-generated plan that needs owner approval before implementation.
+title: "[Codex Plan]: "
+labels:
+  - codex-plan
+  - needs-owner-approval
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Codex builder jobs may only implement this after the owner applies the `codex-approved` label.
+  - type: input
+    id: area
+    attributes:
+      label: Area
+      description: Tool group, service layer, transport, docs, package metadata, or registry surface affected.
+      placeholder: water tools, DPAPI, HTTP transport, README, server.json
+    validations:
+      required: true
+  - type: textarea
+    id: opportunity
+    attributes:
+      label: Opportunity
+      description: What Codex found and why it matters.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Change
+      description: The smallest coherent implementation Codex recommends.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Concrete checks the PR must satisfy.
+      placeholder: |
+        - ...
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links, logs, failing examples, tool outputs, or test output that motivated the plan.
+    validations:
+      required: false
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true
