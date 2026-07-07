@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: noaa-mcp-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Validate package metadata
+        run: |
+          node -e '
+            const fs = require("fs");
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            const server = JSON.parse(fs.readFileSync("server.json", "utf8"));
+            if (pkg.version !== server.version) {
+              throw new Error(`package.json version ${pkg.version} does not match server.json version ${server.version}`);
+            }
+            const npmPackage = server.packages?.find((entry) => entry.registryType === "npm");
+            if (!npmPackage) {
+              throw new Error("server.json must include an npm package entry");
+            }
+            if (npmPackage.identifier !== pkg.name) {
+              throw new Error(`server.json package ${npmPackage.identifier} does not match package.json name ${pkg.name}`);
+            }
+            if (npmPackage.version !== pkg.version) {
+              throw new Error(`server.json package version ${npmPackage.version} does not match package.json version ${pkg.version}`);
+            }
+          '
