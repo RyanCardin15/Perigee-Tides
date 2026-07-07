@@ -189,7 +189,7 @@ src/
 ├── format/             # unit labeling, flag legends, markdown/json response shaping
 ├── schemas/            # shared Zod field schemas with nuance-carrying descriptions
 ├── services/           # Data API, Metadata API, DPAPI, moon & sun services
-├── tools/              # 23 tool registrations grouped by domain
+├── tools/              # 25 tool registrations grouped by domain
 ├── resources/          # noaa:// reference resources
 ├── prompts/            # workflow prompt templates
 └── reference/          # curated NOAA reference content
