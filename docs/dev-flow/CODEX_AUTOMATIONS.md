@@ -21,6 +21,34 @@ Use iMessage only for high-signal outcomes:
 - A scheduled run is blocked and needs owner action.
 - Live smoke testing finds an actionable regression.
 
+Every iMessage must be useful without opening GitHub. Keep it concise, but
+include the substance of the work, not just the link.
+
+Scout message format:
+
+- `Codex MCP scout: suggested <feature/fix title> (#issue).`
+- `Area: <tool group/service/transport/docs/package surface>.`
+- `Why: <user/dev/reliability impact in one sentence>.`
+- `Proposed change: <specific implementation slice>.`
+- `Evidence: <tool output/log/check result/live behavior>.`
+- `Next: approve with codex-approved or leave for later.`
+
+Builder message format:
+
+- `Codex MCP builder: opened PR #<pr> for #<issue> - <title>.`
+- `Changed: <specific tools/services/docs/package behavior>.`
+- `Verification: <local checks and GitHub status>.`
+- `Live smoke: <run result or not required>.`
+- `Risk/notes: <known caveat or rollback note>.`
+- `Next: review PR #<pr>.`
+
+Blocked/failure message format:
+
+- `Codex MCP blocked: <issue/PR/run context>.`
+- `Reason: <exact blocker or failing check>.`
+- `Impact: <what did not happen>.`
+- `Next: <specific owner action needed>.`
+
 ## MCP Scout
 
 Purpose: inspect the MCP package and create owner-reviewable GitHub issues.
@@ -43,7 +71,8 @@ Run behavior:
 6. Create at most three GitHub issues for the best plans.
 7. Label plans with `codex-plan` and `needs-owner-approval`.
 8. Do not implement code.
-9. Send one iMessage only if a strong plan was created or the run is blocked.
+9. Send one iMessage only if a strong plan was created or the run is blocked,
+   following the scout or blocked/failure message format above.
 
 Issue quality bar:
 
@@ -75,7 +104,7 @@ Run behavior:
    - `npm run test:live` when tool/API behavior changes
 7. Open a pull request linked to the issue.
 8. Remove `needs-owner-approval`, add `codex-implemented`.
-9. Send an iMessage with the PR number, check status, and any review notes.
+9. Send an iMessage following the builder message format above.
 
 Hard limits:
 
