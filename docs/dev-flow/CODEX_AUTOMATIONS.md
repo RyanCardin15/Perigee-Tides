@@ -57,6 +57,11 @@ Issue quality bar:
 
 Purpose: implement one approved GitHub issue end-to-end.
 
+Prerequisite: `.github/workflows/ci.yml` must already exist on the current
+`main` checkout. If the bootstrap developer-flow PR has not been merged yet,
+the builder must stop and send an iMessage explaining that approved
+implementation is blocked until CI is present on `main`.
+
 Run behavior:
 
 1. Find the highest-value open issue labeled `codex-approved` and `codex-plan`.
