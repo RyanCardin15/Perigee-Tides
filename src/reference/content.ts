@@ -15,6 +15,7 @@ export const REFERENCE_TOPICS = [
   "quality_flags",
   "date_formats",
   "marine_forecast",
+  "planning",
 ] as const;
 
 export type ReferenceTopic = (typeof REFERENCE_TOPICS)[number];
@@ -223,6 +224,48 @@ How it works:
 - Coverage: US and territories only. No API key; forecasts update ~hourly.
 - Forecast wind direction is where the wind blows FROM, degrees true — same
   convention as CO-OPS wind observations.`,
+
+  planning: `# Planner Tools (derived locally)
+
+Three tools turn raw predictions + astronomy into decision-ready output.
+All are computed locally from hilo tide predictions fetched in GMT plus
+suncalc sun/moon math at the station's coordinates.
+
+## noaa_get_activity_windows
+Scores each day 0–100 for an activity, with plain-English reasons and a
+suggested best window:
+- fishing — moving water (1.5–4.5 h from a high/low) through dawn/dusk,
+  spring-tide bonus near new/full moon
+- boating — daylight high tides for departure/return depth; neap bonus
+- surf_paddle — daylight tide changes and morning tide push
+- beachcombing — daylight lows; big bonus for negative lows
+- photography — tide events landing within ±1.5 h of sunrise/sunset,
+  near-full moon bonus
+- general — daylight low/high "golden windows"
+
+Scores reflect tide/sun/moon geometry ONLY — no weather. Check wind with
+nws_get_wind_forecast before trusting a plan.
+
+## noaa_get_king_tides
+Ranks all predicted highs over the span (default 1 year) and flags days in
+the top percentile (default P98 = top 2%), annotated with moon phase, moon
+distance, perigee proximity (< 370,000 km), and new/full alignment (±2
+days). Perigee + syzygy = perigean spring tide. Predicted astronomical
+tides only — storm surge rides on top.
+
+## noaa_get_tide_calendar
+Renders highs/lows (optionally sunrise/sunset and new/full moon all-day
+markers) as an RFC 5545 iCalendar feed. Event times are UTC-stamped;
+calendar apps localize them. response_format "json" exposes the raw ICS
+string in the "ics" field.
+
+## Shared behavior
+- Pass an IANA "timezone" (e.g. America/New_York) so days group on the
+  local calendar — with UTC grouping, US evening events can land on the
+  next day.
+- Requires a harmonic prediction station (7-digit ID). Great Lakes
+  stations have no tide predictions.
+- Everything is "not for navigation".`,
 };
 
 /** One-line summaries used in resource listings and the guide index. */
@@ -237,4 +280,5 @@ export const REFERENCE_SUMMARIES: Record<ReferenceTopic, string> = {
   quality_flags: "Data quality fields (v/s/f/q), flag letters, HH/H/L/LL",
   date_formats: "Accepted date formats and parameter combinations",
   marine_forecast: "NWS wind & marine forecast tools vs CO-OPS observations",
+  planning: "Activity scores, king tide detection, and ICS tide calendars",
 };

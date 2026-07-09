@@ -58,61 +58,69 @@ No API key is required — NOAA's CO-OPS APIs are open.
 
 ---
 
-## Tools (25)
+## Tools (28)
 
 ### Observations & Predictions (Data API)
 
-| Tool | What it does |
-|---|---|
-| `noaa_get_water_levels` | Observed water levels: 1-minute, 6-minute, or hourly series, preliminary/verified quality flags decoded |
-| `noaa_get_water_level_summaries` | high_low (HH/H/L/LL daily extremes), daily_mean (Great Lakes), daily_max_min, monthly_mean datum tables |
-| `noaa_get_tide_predictions` | Harmonic tide predictions — `hilo` high/low events (up to 10 years) or interval series |
-| `noaa_get_currents` | Observed current speed/direction by depth bin (ADCP), optional beam diagnostics |
-| `noaa_get_current_predictions` | Predicted currents — `max_slack` flood/ebb/slack events or interval series |
-| `noaa_get_meteorological_data` | Wind, air/water temperature, pressure, air gap (bridge clearance), conductivity, visibility, humidity, salinity |
+| Tool                             | What it does                                                                                                    |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `noaa_get_water_levels`          | Observed water levels: 1-minute, 6-minute, or hourly series, preliminary/verified quality flags decoded         |
+| `noaa_get_water_level_summaries` | high_low (HH/H/L/LL daily extremes), daily_mean (Great Lakes), daily_max_min, monthly_mean datum tables         |
+| `noaa_get_tide_predictions`      | Harmonic tide predictions — `hilo` high/low events (up to 10 years) or interval series                          |
+| `noaa_get_currents`              | Observed current speed/direction by depth bin (ADCP), optional beam diagnostics                                 |
+| `noaa_get_current_predictions`   | Predicted currents — `max_slack` flood/ebb/slack events or interval series                                      |
+| `noaa_get_meteorological_data`   | Wind, air/water temperature, pressure, air gap (bridge clearance), conductivity, visibility, humidity, salinity |
 
 ### Station Discovery & Metadata (Metadata API)
 
-| Tool | What it does |
-|---|---|
-| `noaa_search_stations` | Search the station directory by capability type, name substring, state — paginated |
-| `noaa_find_nearest_stations` | Nearest stations to any lat/lon (great-circle, cached directory), filterable by type |
-| `noaa_get_station_info` | Full station record with expandable sensors, flood levels, benchmarks, bins, deployments... |
-| `noaa_get_station_datums` | Tidal datum elevations (MLLW, MSL, MHHW, NAVD88...), HAT/LAT, historic extremes, current or superseded epoch |
-| `noaa_get_harmonic_constituents` | The M2/S2/K1/... constituents behind a station's predictions (water level or current ellipse form) |
-| `noaa_get_prediction_offsets` | Subordinate-station time/height offsets from their reference stations (tide or current) |
+| Tool                             | What it does                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `noaa_search_stations`           | Search the station directory by capability type, name substring, state — paginated                           |
+| `noaa_find_nearest_stations`     | Nearest stations to any lat/lon (great-circle, cached directory), filterable by type                         |
+| `noaa_get_station_info`          | Full station record with expandable sensors, flood levels, benchmarks, bins, deployments...                  |
+| `noaa_get_station_datums`        | Tidal datum elevations (MLLW, MSL, MHHW, NAVD88...), HAT/LAT, historic extremes, current or superseded epoch |
+| `noaa_get_harmonic_constituents` | The M2/S2/K1/... constituents behind a station's predictions (water level or current ellipse form)           |
+| `noaa_get_prediction_offsets`    | Subordinate-station time/height offsets from their reference stations (tide or current)                      |
 
 ### Climate & Derived Products (DPAPI)
 
-| Tool | What it does |
-|---|---|
-| `noaa_get_sea_level_trends` | Long-term relative sea level trend with error bars and observation period |
-| `noaa_get_sea_level_rise_projections` | 2022 Interagency SLR scenario projections per decade through 2150 |
-| `noaa_get_extreme_water_levels` | Annual exceedance probability levels (e.g. the "100-year" water level) |
-| `noaa_get_top_ten_water_levels` | Highest water levels ever recorded, with causal events (hurricanes, nor'easters) |
-| `noaa_get_high_tide_flooding` | HTF flood-day counts (daily/monthly/seasonal/annual), outlooks, decadal projections, likelihoods |
+| Tool                                  | What it does                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `noaa_get_sea_level_trends`           | Long-term relative sea level trend with error bars and observation period                        |
+| `noaa_get_sea_level_rise_projections` | 2022 Interagency SLR scenario projections per decade through 2150                                |
+| `noaa_get_extreme_water_levels`       | Annual exceedance probability levels (e.g. the "100-year" water level)                           |
+| `noaa_get_top_ten_water_levels`       | Highest water levels ever recorded, with causal events (hurricanes, nor'easters)                 |
+| `noaa_get_high_tide_flooding`         | HTF flood-day counts (daily/monthly/seasonal/annual), outlooks, decadal projections, likelihoods |
+
+### Planner (derived locally from predictions + astronomy)
+
+| Tool                        | What it does                                                                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `noaa_get_activity_windows` | Scores each day 0–100 for fishing, boating, surf/paddle, beachcombing, photography, or general shore time — tide events × sunrise/sunset × moon phase, with plain-English reasons and a suggested best window |
+| `noaa_get_king_tides`       | Finds upcoming king tide days (top-percentile predicted highs) with the lunar mechanics behind them: perigee proximity and new/full moon alignment                                                            |
+| `noaa_get_tide_calendar`    | Renders high/low predictions (plus optional sunrise/sunset and new/full moon markers) as an iCalendar (ICS) feed for Google/Apple Calendar or Outlook                                                         |
 
 ### Astronomy (computed locally)
 
-| Tool | What it does |
-|---|---|
-| `astro_get_moon_phase` | Phase, illumination, age, distance for a date or range (spring/neap tide context) |
-| `astro_get_next_moon_phase` | Next new/full/quarter moon date(s) |
-| `astro_get_sun_times` | Sunrise/sunset, twilights, golden hour, day length for any location/date |
-| `astro_get_sun_position` | Azimuth/altitude (+ approximate declination/RA) |
-| `astro_get_next_sun_event` | Next occurrence(s) of any sun event |
+| Tool                        | What it does                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| `astro_get_moon_phase`      | Phase, illumination, age, distance for a date or range (spring/neap tide context) |
+| `astro_get_next_moon_phase` | Next new/full/quarter moon date(s)                                                |
+| `astro_get_sun_times`       | Sunrise/sunset, twilights, golden hour, day length for any location/date          |
+| `astro_get_sun_position`    | Azimuth/altitude (+ approximate declination/RA)                                   |
+| `astro_get_next_sun_event`  | Next occurrence(s) of any sun event                                               |
 
 ### Wind & Marine Forecasts (NWS Weather API)
 
-| Tool | What it does |
-|---|---|
-| `nws_get_wind_forecast` | Hourly numeric wind forecast (speed/gust/direction, wave height where gridded) for any US lat/lon, up to ~7 days |
-| `nws_get_marine_forecast` | Official Coastal Waters Forecast narrative for the marine zone covering a lat/lon, incl. Small Craft Advisories |
+| Tool                      | What it does                                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `nws_get_wind_forecast`   | Hourly numeric wind forecast (speed/gust/direction, wave height where gridded) for any US lat/lon, up to ~7 days |
+| `nws_get_marine_forecast` | Official Coastal Waters Forecast narrative for the marine zone covering a lat/lon, incl. Small Craft Advisories  |
 
 ### Reference
 
-| Tool | What it does |
-|---|---|
+| Tool                       | What it does                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `noaa_get_reference_guide` | Curated NOAA reference: products, datums, units, time zones, intervals, station types, data limits, quality flags, date formats, marine forecasts |
 
 Every tool supports `response_format: "markdown"` (readable tables with units spelled out — the default) or `"json"` (complete structured payload), and attaches structured content for MCP clients that consume it.
@@ -136,7 +144,7 @@ Every tool supports `response_format: "markdown"` (readable tables with units sp
 These are the things that make NOAA's API tricky — this server encodes them:
 
 - **Datums matter.** Heights are meaningless without a vertical reference. MLLW (chart datum) is the default; stations differ in which datums they support (Great Lakes use IGLD/LWD and have **no tide predictions**). `noaa_get_station_datums` gives the conversion table.
-- **Units are asymmetric.** `metric` means m/s for wind but **cm/s for currents**; air pressure is millibars and salinity PSU in *both* systems. Every response labels its units.
+- **Units are asymmetric.** `metric` means m/s for wind but **cm/s for currents**; air pressure is millibars and salinity PSU in _both_ systems. Every response labels its units.
 - **Per-product request-span limits** (4 days for 1-minute data, 31 days for 6-minute, 1 year hourly, 10 years for hilo predictions...) are validated client-side with actionable messages before hitting NOAA.
 - **Two station ID schemes.** Water-level/met stations are 7-digit numeric (`9414290`); current stations are alphanumeric (`cb0102`).
 - **Reference vs subordinate stations.** Subordinate (S) prediction stations only support `hilo` predictions, derived by offsets from a reference (R) station.
@@ -189,13 +197,14 @@ src/
 ├── format/             # unit labeling, flag legends, markdown/json response shaping
 ├── schemas/            # shared Zod field schemas with nuance-carrying descriptions
 ├── services/           # Data API, Metadata API, DPAPI, moon & sun services
-├── tools/              # 25 tool registrations grouped by domain
+├── tools/              # 28 tool registrations grouped by domain
 ├── resources/          # noaa:// reference resources
 ├── prompts/            # workflow prompt templates
 └── reference/          # curated NOAA reference content
 ```
 
 Data sources:
+
 - **Data API** — `api.tidesandcurrents.noaa.gov/api/prod/datagetter`
 - **Metadata API** — `api.tidesandcurrents.noaa.gov/mdapi/prod/webapi`
 - **Derived Product API** — `api.tidesandcurrents.noaa.gov/dpapi/prod/webapi`

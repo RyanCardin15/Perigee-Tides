@@ -9,6 +9,7 @@ import { registerMetTools } from "./met.js";
 import { registerStationTools } from "./stations.js";
 import { registerStationMetadataTools } from "./station-metadata.js";
 import { registerDerivedProductTools } from "./derived.js";
+import { registerPlannerTools } from "./planner.js";
 import { registerAstronomyTools } from "./astronomy.js";
 import { registerMarineForecastTools } from "./marine-forecast.js";
 import { registerReferenceTools } from "./reference.js";
@@ -20,6 +21,7 @@ export function registerAllTools(server: McpServer): void {
   registerStationTools(server);
   registerStationMetadataTools(server);
   registerDerivedProductTools(server);
+  registerPlannerTools(server);
   registerAstronomyTools(server);
   registerMarineForecastTools(server);
   registerReferenceTools(server);
