@@ -15,6 +15,7 @@ export const REFERENCE_TOPICS = [
   "quality_flags",
   "date_formats",
   "marine_forecast",
+  "fishing",
 ] as const;
 
 export type ReferenceTopic = (typeof REFERENCE_TOPICS)[number];
@@ -223,6 +224,37 @@ How it works:
 - Coverage: US and territories only. No API key; forecasts update ~hourly.
 - Forecast wind direction is where the wind blows FROM, degrees true — same
   convention as CO-OPS wind observations.`,
+
+  fishing: `# Fishing Conditions Toolkit
+
+The data layers the major fishing apps combine, and which tool serves each:
+
+| Layer | Tool | Source |
+|---|---|---|
+| Solunar bite times (majors/minors, day rating, activity curve) | astro_get_solunar_forecast | computed locally (lunar transit/rise/set) |
+| Tide stage & high/low times | noaa_get_tide_predictions | NOAA CO-OPS harmonics |
+| Observed waves, water temp, offshore wind | ndbc_get_buoy_observations (find IDs with ndbc_find_nearest_buoys) | NOAA NDBC realtime |
+| Barometric pressure trend (pre/post-frontal bite logic) | noaa_get_pressure_trend | derived from CO-OPS air_pressure |
+| Wave/swell/SST/current FORECAST anywhere at sea | openmeteo_get_marine_forecast | Open-Meteo wave-model blend |
+| Wind forecast | nws_get_wind_forecast | NWS gridpoints (US only) |
+| Marine narrative & advisories | nws_get_marine_forecast | NWS Coastal Waters Forecast |
+| Moon phase / spring-neap context | astro_get_moon_phase | computed locally |
+
+How anglers combine them:
+- SOLUNAR sets the day's candidate windows (majors > minors; windows that
+  overlap dawn/dusk are strongest). It is a heuristic — conditions rule.
+- PRESSURE TREND modulates expectations: falling = feed window ahead of a
+  front; sharp post-frontal rise = tough bite (fish deeper/slower).
+- TIDE STAGE picks the spot: moving water (mid-tide, or the hour around a
+  high/low turn) beats slack at most inshore spots.
+- WIND/WAVES decide safety and water clarity; SST breaks concentrate bait.
+
+ID namespaces differ: CO-OPS stations ("8454000", "cb0102") vs NDBC buoys
+("44018", "BUZM3") — never mix them across tools.
+
+Solunar, tide-prediction, buoy-observation, and marine-forecast results
+render interactive charts in MCP hosts that support MCP Apps (Claude,
+ChatGPT, VS Code, ...); other hosts get the same data as markdown + JSON.`,
 };
 
 /** One-line summaries used in resource listings and the guide index. */
@@ -237,4 +269,6 @@ export const REFERENCE_SUMMARIES: Record<ReferenceTopic, string> = {
   quality_flags: "Data quality fields (v/s/f/q), flag letters, HH/H/L/LL",
   date_formats: "Accepted date formats and parameter combinations",
   marine_forecast: "NWS wind & marine forecast tools vs CO-OPS observations",
+  fishing:
+    "Combining solunar, tide, buoy, pressure-trend, and marine-model tools for bite planning",
 };

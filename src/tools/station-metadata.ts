@@ -128,7 +128,10 @@ Use for: building custom tide computations, checking a station's dominant consti
         const amplitudeUnits =
           typeof payload.units === "string" && payload.units
             ? payload.units
-            : unitLabel(isCurrentStation ? "currents" : "water_level", params.units);
+            : unitLabel(
+                isCurrentStation ? "currents" : "water_level",
+                params.units,
+              );
         const structured = {
           station: params.station,
           bin: params.bin,

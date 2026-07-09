@@ -1,7 +1,7 @@
 {
   "name": "@ryancardin/noaa-tides-currents-mcp-server",
   "version": "2.0.1",
-  "description": "MCP server for NOAA CO-OPS Tides and Currents: water levels, tide predictions, currents, meteorology, station metadata, datums, high tide flooding, sea level trends, plus sun and moon calculations",
+  "description": "MCP server for NOAA CO-OPS Tides and Currents: water levels, tide predictions, currents, meteorology, station metadata, datums, high tide flooding, sea level trends, plus NDBC buoys, solunar fishing forecasts, marine wave/SST models, sun and moon calculations, and interactive MCP Apps charts",
   "main": "dist/index.js",
   "bin": {
     "noaa-mcp": "dist/index.js"
@@ -13,7 +13,7 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.ui.json && node scripts/build-ui.mjs",
     "start": "node dist/index.js",
     "start:http": "node dist/index.js --http --port 3000",
     "dev": "tsx src/index.ts",
@@ -32,6 +32,12 @@
     "tide-predictions",
     "mcp",
     "model-context-protocol",
+    "mcp-apps",
+    "fishing",
+    "solunar",
+    "ndbc",
+    "buoy",
+    "marine-weather",
     "api"
   ],
   "author": "Cardin Labs <support@cardinlabs.com> (https://cardinlabs.com)",
@@ -52,6 +58,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.4",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "axios": "^1.7.9",
     "express": "^5.0.0",
@@ -61,6 +68,7 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.0",
+    "esbuild": "^0.28.1",
     "prettier": "^3.0.3",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
