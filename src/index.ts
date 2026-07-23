@@ -5,7 +5,10 @@
  * Exposes NOAA CO-OPS data (water levels, tide predictions, currents,
  * meteorology), station metadata (datums, harmonic constituents, offsets),
  * derived products (sea level trends/projections, extreme water levels,
- * high tide flooding), and local sun/moon calculations.
+ * high tide flooding), NDBC buoy observations, Open-Meteo marine model
+ * forecasts, and local sun/moon/solunar calculations. Tide, solunar, buoy,
+ * and marine-forecast tools also render interactive charts in MCP hosts
+ * that support the MCP Apps extension.
  *
  * Transport: stdio by default (for MCP client integration); pass --http
  * [--port N] for a stateless streamable-HTTP endpoint at /mcp.

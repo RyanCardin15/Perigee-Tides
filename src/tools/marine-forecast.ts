@@ -81,7 +81,11 @@ This is FORECAST data. For observed (measured) wind at a NOAA station right now,
         const convertSpeed = (knots: number | null) =>
           knots === null ? null : metric ? round1(knotsToMs(knots)) : knots;
         const convertWave = (meters: number | null) =>
-          meters === null ? null : metric ? meters : round1(metersToFeet(meters));
+          meters === null
+            ? null
+            : metric
+              ? meters
+              : round1(metersToFeet(meters));
 
         const data = forecast.samples.map((s) => ({
           time_utc: s.time,

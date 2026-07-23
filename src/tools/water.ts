@@ -3,6 +3,7 @@
  */
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import {
   getWaterLevels,
@@ -10,6 +11,7 @@ import {
   getTidePredictions,
   type DataApiResponse,
 } from "../services/data-api.js";
+import { CHARTS_UI_URI } from "../ui/app-resource.js";
 import {
   dateFields,
   DatumSchema,
@@ -241,11 +243,12 @@ Use for: historical extremes, mixed-tide analysis (HH vs H), long-term averages.
     },
   );
 
-  server.registerTool(
+  registerAppTool(
+    server,
     "noaa_get_tide_predictions",
     {
       title: "Get Tide Predictions",
-      description: `Get NOAA harmonic tide predictions (future or past) for a station.
+      description: `Get NOAA harmonic tide predictions (future or past) for a station. In MCP hosts that support Apps, this renders an interactive tide-curve chart.
 
 interval="hilo" (recommended for "when is high/low tide") returns the daily tide events with type H/L — up to 10 years per request. Other intervals (h, 1, 5, 6, 10, 15, 30, 60 minutes) return a height time series — up to 1 year per request.
 
@@ -268,6 +271,7 @@ Heights are relative to the requested datum (MLLW default). Notes:
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      _meta: { ui: { resourceUri: CHARTS_UI_URI } },
     },
     async (params) => {
       try {
@@ -275,6 +279,7 @@ Heights are relative to the requested datum (MLLW default). Notes:
         const data = response.predictions ?? [];
         const unitsLabel = `${unitLabel("water_level", params.units)} above ${params.datum}`;
         const structured = {
+          viz: { kind: "tide_curve" },
           station: params.station,
           product: "predictions",
           interval: params.interval,

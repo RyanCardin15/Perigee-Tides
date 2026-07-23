@@ -17,7 +17,9 @@ import {
   DPAPI_BASE_URL,
   MAX_RETRIES,
   METADATA_API_BASE_URL,
+  NDBC_BASE_URL,
   NWS_API_BASE_URL,
+  OPEN_METEO_MARINE_BASE_URL,
   NWS_USER_AGENT,
   REQUEST_TIMEOUT_MS,
 } from "../constants.js";
@@ -284,6 +286,76 @@ export async function fetchNwsApi<T = Record<string, unknown>>(
   } catch (error) {
     if (error instanceof NoaaApiError) throw error;
     throw toNwsError(error);
+  }
+}
+
+/**
+ * NDBC GET: path like "/data/realtime2/41013.txt" or "/activestations.xml".
+ * NDBC serves plain text/XML (no JSON API) and answers unknown stations with
+ * a bare 404 HTML page, so responses come back as raw strings.
+ */
+export async function fetchNdbcText(path: string): Promise<string> {
+  try {
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await http.get<string>(`${NDBC_BASE_URL}${path}`, {
+          responseType: "text",
+          // Axios auto-parses JSON-looking bodies; force text through.
+          transformResponse: [(data: string) => data],
+          headers: { Accept: "text/plain, application/xml, text/xml, */*" },
+        });
+        return response.data;
+      } catch (error) {
+        lastError = error;
+        if (attempt < MAX_RETRIES && isRetryable(error)) {
+          await sleep(500 * Math.pow(3, attempt));
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw lastError;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw new NoaaApiError(
+        "NOAA NDBC error: not found (404). The buoy ID may be wrong, or this station is not reporting realtime data. Find active buoys with ndbc_find_nearest_buoys.",
+        404,
+      );
+    }
+    throw toNoaaError(error, "NDBC");
+  }
+}
+
+/**
+ * Open-Meteo Marine API GET. Error bodies look like
+ * {"error": true, "reason": "..."} — surfaced with the reason attached.
+ */
+export async function fetchOpenMeteoMarine<T = Record<string, unknown>>(
+  params: Record<string, string | number | boolean | undefined | null>,
+): Promise<T> {
+  try {
+    const data = await getWithRetry<T>(
+      OPEN_METEO_MARINE_BASE_URL,
+      cleanParams(params),
+    );
+    const body = data as { error?: boolean; reason?: string };
+    if (body && body.error) {
+      throw new NoaaApiError(
+        `Open-Meteo Marine API error: ${body.reason ?? "unknown error"}.`,
+      );
+    }
+    return data;
+  } catch (error) {
+    if (error instanceof NoaaApiError) throw error;
+    if (axios.isAxiosError(error) && error.response) {
+      const body = error.response.data as { reason?: string } | undefined;
+      throw new NoaaApiError(
+        `Open-Meteo Marine API error: ${body?.reason ?? `HTTP ${error.response.status}`}. The point may be on land — marine model cells cover ocean only; try a coordinate further offshore.`,
+        error.response.status,
+      );
+    }
+    throw toNoaaError(error, "Open-Meteo Marine");
   }
 }
 

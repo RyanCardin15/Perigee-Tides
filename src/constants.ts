@@ -18,6 +18,21 @@ export const DPAPI_BASE_URL =
 export const NWS_API_BASE_URL = "https://api.weather.gov";
 
 /**
+ * NOAA NDBC — National Data Buoy Center. Realtime observations are plain
+ * fixed-format text files (no JSON API): /data/realtime2/{ID}.txt, and the
+ * active-station directory is /activestations.xml.
+ */
+export const NDBC_BASE_URL = "https://www.ndbc.noaa.gov";
+
+/**
+ * Open-Meteo Marine API — keyless JSON wave/swell/SST/current model forecasts
+ * (GFS-Wave, ECMWF WAM, ICON-Wave blends). Free for non-commercial use with
+ * attribution; data is model output, not observations.
+ */
+export const OPEN_METEO_MARINE_BASE_URL =
+  "https://marine-api.open-meteo.com/v1/marine";
+
+/**
  * NWS requires a descriptive User-Agent identifying the application and a
  * contact point (their abuse-mitigation mechanism; the API has no keys).
  */
@@ -51,4 +66,8 @@ export const CACHE_TTL = {
   nwsPoint: 6 * 60 * 60 * 1000,
   /** NWS forecasts and marine text products update roughly hourly. */
   nwsForecast: 30 * 60 * 1000,
+  /** NDBC active-station directory (updated daily upstream). */
+  ndbcStations: 6 * 60 * 60 * 1000,
+  /** NDBC realtime observations post roughly every 10 minutes to hourly. */
+  ndbcObservations: 10 * 60 * 1000,
 } as const;
