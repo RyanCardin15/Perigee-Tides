@@ -10,6 +10,7 @@
  *    differently on purpose)
  */
 
+import { providerDeadline } from "./deadline.js";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import {
   APPLICATION_NAME,
@@ -79,14 +80,32 @@ async function getWithRetry<T>(
   params: Record<string, string>,
   instance: AxiosInstance = http,
 ): Promise<T> {
+  const startedAt = Date.now();
+  const budgetMs = 18_000;
   let lastError: unknown;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await instance.get<T>(url, { params });
+      const deadline = providerDeadline();
+      const remainingMs = Math.min(
+        budgetMs - (Date.now() - startedAt),
+        deadline ? deadline.endsAt - Date.now() : Infinity,
+      );
+      if (remainingMs <= 0 || deadline?.signal.aborted)
+        throw new NoaaApiError("Provider request deadline reached.", 504);
+      const response = await instance.get<T>(url, {
+        params,
+        timeout: Math.min(REQUEST_TIMEOUT_MS, remainingMs),
+        signal: deadline?.signal,
+      });
       return response.data;
     } catch (error) {
       lastError = error;
-      if (attempt < MAX_RETRIES && isRetryable(error)) {
+      if (
+        attempt < MAX_RETRIES &&
+        !providerDeadline()?.signal.aborted &&
+        isRetryable(error) &&
+        500 * Math.pow(3, attempt) < budgetMs - (Date.now() - startedAt)
+      ) {
         await sleep(500 * Math.pow(3, attempt)); // 500ms, 1.5s
         continue;
       }

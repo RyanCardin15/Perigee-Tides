@@ -29,10 +29,14 @@ Consult this before constructing unusual requests — especially "datums" (which
           .describe("Reference topic to retrieve."),
       },
       annotations: LOCAL_COMPUTE_ANNOTATIONS,
+      outputSchema: z
+        .object({ topic: z.enum(REFERENCE_TOPICS), guide: z.string() })
+        .strict(),
     },
     async ({ topic }) => {
       try {
         return {
+          structuredContent: { topic, guide: REFERENCE_CONTENT[topic] },
           content: [{ type: "text" as const, text: REFERENCE_CONTENT[topic] }],
         };
       } catch (error) {

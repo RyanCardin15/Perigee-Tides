@@ -16,7 +16,12 @@ import {
   LongitudeSchema,
   ResponseFormatSchema,
 } from "../schemas/common.js";
-import { markdownTable, respond, respondError } from "../format/respond.js";
+import {
+  markdownTable,
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 
 const IsoDateSchema = z
   .string()
@@ -53,6 +58,7 @@ Tide context: spring tides (largest range) occur just after new and full moons; 
         response_format: ResponseFormatSchema,
       },
       annotations: LOCAL_COMPUTE_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -131,6 +137,7 @@ Use for: "when is the next full moon?", planning around spring tides (which foll
         response_format: ResponseFormatSchema,
       },
       annotations: LOCAL_COMPUTE_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -170,6 +177,7 @@ Times are ISO UTC unless an IANA timezone is provided. At high latitudes some ev
         response_format: ResponseFormatSchema,
       },
       annotations: LOCAL_COMPUTE_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -244,6 +252,7 @@ Use for: shadow/lighting analysis, solar exposure. Computed locally with suncalc
         response_format: ResponseFormatSchema,
       },
       annotations: LOCAL_COMPUTE_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -294,6 +303,7 @@ Use for: "when is sunset today?", planning golden-hour photography or dawn fishi
         response_format: ResponseFormatSchema,
       },
       annotations: LOCAL_COMPUTE_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {

@@ -19,7 +19,11 @@ import {
   ResponseFormatSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { respond, respondError } from "../format/respond.js";
+import {
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 import { seriesMarkdown } from "../format/series.js";
 
 /** "2026-07-06 09:00" in the gridpoint's IANA time zone. */
@@ -67,6 +71,7 @@ This is FORECAST data. For observed (measured) wind at a NOAA station right now,
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -81,7 +86,11 @@ This is FORECAST data. For observed (measured) wind at a NOAA station right now,
         const convertSpeed = (knots: number | null) =>
           knots === null ? null : metric ? round1(knotsToMs(knots)) : knots;
         const convertWave = (meters: number | null) =>
-          meters === null ? null : metric ? meters : round1(metersToFeet(meters));
+          meters === null
+            ? null
+            : metric
+              ? meters
+              : round1(metersToFeet(meters));
 
         const data = forecast.samples.map((s) => ({
           time_utc: s.time,
@@ -164,6 +173,7 @@ For numeric hourly wind values use nws_get_wind_forecast; for observed wind at a
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {

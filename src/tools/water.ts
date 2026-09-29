@@ -19,7 +19,11 @@ import {
   TimeZoneSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { respond, respondError } from "../format/respond.js";
+import {
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 import { seriesMarkdown, timeZoneLabel } from "../format/series.js";
 import { FLAG_LEGENDS, unitLabel } from "../format/units.js";
 
@@ -54,6 +58,7 @@ Use for: "what is the water level right now" (date=latest), storm surge analysis
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -137,6 +142,7 @@ Use for: historical extremes, mixed-tide analysis (HH vs H), long-term averages.
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -268,6 +274,7 @@ Heights are relative to the requested datum (MLLW default). Notes:
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {

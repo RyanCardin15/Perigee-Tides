@@ -16,7 +16,11 @@ import {
   TimeZoneSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { respond, respondError } from "../format/respond.js";
+import {
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 import { seriesMarkdown, timeZoneLabel } from "../format/series.js";
 import { FLAG_LEGENDS, MeasurementKind, unitLabel } from "../format/units.js";
 
@@ -69,6 +73,7 @@ Not every station has every sensor — check with noaa_get_station_info (expand 
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
