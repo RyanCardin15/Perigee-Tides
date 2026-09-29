@@ -5,10 +5,23 @@
  * tables with units spelled out) or "json" (complete structured payload).
  * Structured content is attached in both modes so MCP clients that support
  * it can consume typed output. Responses longer than CHARACTER_LIMIT are
- * truncated with guidance rather than flooding the agent's context.
+ * rejected with narrowing guidance, including their structured payload.
  */
 
+import { z } from "zod";
 import { CHARACTER_LIMIT } from "../constants.js";
+
+/** Stable delivery contract; provider/domain fields remain additive. */
+export const RawToolOutputSchema = z
+  .object({
+    _response: z
+      .object({
+        contractVersion: z.literal("2026-09-29.1"),
+        status: z.literal("complete"),
+      })
+      .strict(),
+  })
+  .passthrough();
 
 export type ResponseFormat = "markdown" | "json";
 
@@ -25,16 +38,31 @@ export function respond(
   structured: Record<string, unknown>,
   markdown: string,
 ): ToolResult {
-  let text = format === "json" ? JSON.stringify(structured, null, 2) : markdown;
-  if (text.length > CHARACTER_LIMIT) {
-    text =
-      text.slice(0, CHARACTER_LIMIT) +
-      "\n\n…[truncated: response exceeded the size limit. Narrow the date range, lower the limit parameter, or request fewer fields.]";
-  }
-  return {
-    content: [{ type: "text", text }],
-    structuredContent: structured,
+  const payload = {
+    ...structured,
+    _response: { contractVersion: "2026-09-29.1", status: "complete" },
   };
+  const json = JSON.stringify(payload);
+  const text = format === "json" ? json : markdown;
+  if (json.length > CHARACTER_LIMIT || text.length > CHARACTER_LIMIT) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: "text",
+          text: "The complete response exceeds the delivery limit. Narrow the date range, lower the limit, or request fewer fields; no partial result is presented as complete.",
+        },
+      ],
+      _meta: {
+        error: {
+          code: "response_too_large",
+          retryable: false,
+          limitCharacters: CHARACTER_LIMIT,
+        },
+      },
+    };
+  }
+  return { content: [{ type: "text", text }], structuredContent: payload };
 }
 
 /** Build an error tool response (kept inside the result per MCP guidance). */
@@ -42,6 +70,15 @@ export function respondError(error: unknown): ToolResult {
   const message = error instanceof Error ? error.message : String(error);
   return {
     isError: true,
+    _meta: {
+      error: {
+        code: "provider_error",
+        retryable:
+          (error as { status?: number })?.status === undefined ||
+          (error as { status?: number }).status === 429 ||
+          ((error as { status?: number }).status ?? 0) >= 500,
+      },
+    },
     content: [{ type: "text", text: `Error: ${message}` }],
   };
 }

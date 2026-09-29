@@ -19,7 +19,12 @@ import {
   StationIdSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { markdownTable, respond, respondError } from "../format/respond.js";
+import {
+  markdownTable,
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 
 const StationTypeSchema = z
   .enum(STATION_TYPES)
@@ -88,6 +93,7 @@ Returns id, name, location, tide type, Great Lakes flag, and for prediction stat
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -175,6 +181,7 @@ Distance is computed great-circle (Haversine) and reported in both km and miles.
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -267,6 +274,7 @@ Use this before requesting data to confirm what the station actually collects. F
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {

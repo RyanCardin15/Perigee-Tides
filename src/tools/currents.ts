@@ -13,7 +13,11 @@ import {
   TimeZoneSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { respond, respondError } from "../format/respond.js";
+import {
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 import { seriesMarkdown, timeZoneLabel } from "../format/series.js";
 import { unitLabel } from "../format/units.js";
 
@@ -52,6 +56,7 @@ Returns per record: t (time), s (speed), d (direction, degrees true), b (bin num
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -118,6 +123,7 @@ vel_type="speed_dir" returns Speed/Direction pairs; "default" returns velocities
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {

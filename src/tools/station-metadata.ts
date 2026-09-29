@@ -12,7 +12,12 @@ import {
   StationIdSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { markdownTable, respond, respondError } from "../format/respond.js";
+import {
+  markdownTable,
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 import { unitLabel } from "../format/units.js";
 
 export function registerStationMetadataTools(server: McpServer): void {
@@ -37,6 +42,7 @@ All values share one reference zero (the station datum), so datum-to-datum conve
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -108,6 +114,7 @@ Use for: building custom tide computations, checking a station's dominant consti
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -128,7 +135,10 @@ Use for: building custom tide computations, checking a station's dominant consti
         const amplitudeUnits =
           typeof payload.units === "string" && payload.units
             ? payload.units
-            : unitLabel(isCurrentStation ? "currents" : "water_level", params.units);
+            : unitLabel(
+                isCurrentStation ? "currents" : "water_level",
+                params.units,
+              );
         const structured = {
           station: params.station,
           bin: params.bin,
@@ -214,6 +224,7 @@ Reference (R) stations return empty/null offsets — they don't need any.`,
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {

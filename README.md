@@ -206,3 +206,7 @@ Data sources:
 MIT © [Cardin LLC](https://cardinlabs.com) (Cardin Labs)
 
 NOAA data is provided by the NOAA Center for Operational Oceanographic Products and Services (CO-OPS). This project is not affiliated with or endorsed by NOAA.
+
+## 2.1.0 tool delivery contract
+
+Every raw tool advertises an output schema. Successful provider payloads retain their fields and add `_response: { contractVersion: "2026-09-29.1", status: "complete" }`. Reference guides have a separate typed topic/guide result. Both text and structured payloads are bounded: an oversized result returns an explicit `response_too_large` error with narrowing guidance instead of truncated text alongside an unbounded structured response. Error metadata states whether retry may help. Chained provider reads share a 45-second cancellation deadline and each request has an 18-second total retry budget. No fishing, navigation or catch probability is inferred from raw data.

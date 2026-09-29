@@ -35,20 +35,38 @@ describe("respond", () => {
   it("returns markdown text with structured content attached", () => {
     const result = respond("markdown", { a: 1 }, "# Hello");
     expect(result.content[0].text).toBe("# Hello");
-    expect(result.structuredContent).toEqual({ a: 1 });
+    expect(result.structuredContent).toMatchObject({
+      a: 1,
+      _response: { status: "complete" },
+    });
     expect(result.isError).toBeUndefined();
   });
 
   it("returns pretty JSON in json mode", () => {
     const result = respond("json", { a: 1 }, "# ignored");
-    expect(JSON.parse(result.content[0].text)).toEqual({ a: 1 });
+    expect(JSON.parse(result.content[0].text)).toEqual(
+      result.structuredContent,
+    );
   });
 
-  it("truncates oversized responses with guidance", () => {
+  it("rejects oversized results without attaching an unbounded structured body", () => {
     const huge = "x".repeat(CHARACTER_LIMIT + 500);
     const result = respond("markdown", {}, huge);
     expect(result.content[0].text.length).toBeLessThan(CHARACTER_LIMIT + 200);
-    expect(result.content[0].text).toContain("truncated");
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(result.content[0].text).toContain("Narrow");
+    expect(
+      respond(
+        "markdown",
+        {
+          rows: Array.from({ length: 1000 }, () => ({
+            value: "x".repeat(100),
+          })),
+        },
+        "tiny table",
+      ).isError,
+    ).toBe(true);
   });
 });
 

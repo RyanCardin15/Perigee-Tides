@@ -19,7 +19,12 @@ import {
   StationIdSchema,
   UnitsSchema,
 } from "../schemas/common.js";
-import { markdownTable, respond, respondError } from "../format/respond.js";
+import {
+  markdownTable,
+  respond,
+  respondError,
+  RawToolOutputSchema,
+} from "../format/respond.js";
 
 type Row = Record<string, unknown>;
 
@@ -88,6 +93,7 @@ Relative sea level combines ocean rise AND local land movement (subsidence/uplif
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -147,6 +153,7 @@ Scenarios: low, intermediate-low, intermediate, intermediate-high, high, extreme
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -196,6 +203,7 @@ Use for flood risk questions ("what water level has a 1% chance per year at X?")
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -261,6 +269,7 @@ Heights are relative to the requested datum (MHHW is typical for flood compariso
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
@@ -381,6 +390,7 @@ Use for: "how often does X flood?", trends in nuisance flooding, future flooding
         response_format: ResponseFormatSchema,
       },
       annotations: READ_ONLY_ANNOTATIONS,
+      outputSchema: RawToolOutputSchema,
     },
     async (params) => {
       try {
